@@ -7,7 +7,7 @@
  This example code is in the public domain.
  */
 
-int led = 9;           // the pin that the LED is attached to
+int led = 3;           // the pin that the LED is attached to
 int brightness = 0;    // how bright the LED is
 int fadeAmount = 5;    // how many points to fade the LED by
 
@@ -25,7 +25,7 @@ void loop() {
   //reps are the number of cycles to run it
   
   //number of milliseconds in a full on-off cycle
-  int full_cycle = 3;
+  float full_cycle = 3;
   int num_reps = 100;
   
   for (int duty = 0; duty <=100; duty++)
@@ -33,7 +33,7 @@ void loop() {
     for (int reps_done = 0; reps_done < num_reps; reps_done++)
     {    
       float high_time = full_cycle * duty / 100;
-      digitalWrite(led, HIGH);
+      digitalWrite(led, HIGH);      
       delay(high_time);
       digitalWrite(led, LOW);
       delay (full_cycle - high_time) ;
