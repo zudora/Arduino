@@ -42,12 +42,12 @@ void loop()
       if (progMode == 0)
       {
         //alternate();
-        interval = 100;
+        interval = 100;        
         cycleCount = 2;   //keeps this prog from running
       }
       else
-      {
-        interval = 50;
+      {   
+        interval = 200;     
         sweep();        
       }      
       prevMillis = currMillis;      
@@ -110,21 +110,27 @@ void alternate()
 }
 
 void sweep()
-{
+{  
   // Turn on each line in turn
-  int onLine = 0;
-  while (onLine < 5)
-  { 
-    chooseLine(onLine);
-    delay(200);
-    onLine++;
-  }
-  while (onLine >= 0)
-  { 
-    chooseLine(onLine);
-    delay(200);
-    onLine--;
-  }  
+  while (sweepCount < 10)
+  {
+    int onLine = -1;
+    while (onLine < 5)
+    { 
+      chooseLine(onLine);
+      delay(interval);
+      onLine++;
+    }
+    while (onLine >= -1)
+    { 
+      chooseLine(onLine);
+      delay(interval);
+      onLine--;
+    }
+    interval = interval + 100;
+    
+    sweepCount++;
+  }    
   cycleCount++;
 }
 
