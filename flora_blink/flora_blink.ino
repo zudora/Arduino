@@ -2,7 +2,12 @@ int led1 = 9;
 int led2 = 10;
 int led3 = 12;
 int led4 = 6;
-int led5 = 3;
+int led5 = 1;
+unsigned long prevMillis = 0;
+long interval = 200;
+int yLedState = HIGH;
+int wLedState = LOW;
+int roundCount = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -16,16 +21,48 @@ void setup() {
 
 // the loop routine runs over and over again forever:
 void loop() {
-  digitalWrite(led1, HIGH);
-  digitalWrite(led2, HIGH);
-  digitalWrite(led3, LOW);
-  digitalWrite(led4, LOW);
-  digitalWrite(led5, LOW);  // turn the LED on (HIGH is the voltage level)
-  delay(1000);               // wait for a second
-  digitalWrite(led1, LOW);
-  digitalWrite(led2, LOW);
-  digitalWrite(led3, HIGH);
-  digitalWrite(led4, HIGH);
-  digitalWrite(led5, HIGH); // turn the LED off by making the voltage LOW
-  delay(1000);               // wait for a second
+
+  unsigned long currMillis = millis();  
+  if (currMillis - prevMillis >= interval)
+  {    
+    if (yLedState == HIGH)
+    {
+      yLedState = LOW;
+      wLedState = HIGH;
+    }
+    else
+    {
+      yLedState = HIGH;
+      wLedState = LOW;
+    }
+    prevMillis = currMillis;
+    if (roundCount == 3)
+    {
+      interval = interval + 100;
+      if (interval >= 4000)
+      {
+        interval = 200;      
+      }
+      roundCount = 0;    
+    }  
+    digitalWrite(led1, yLedState);
+    digitalWrite(led2, wLedState);
+    digitalWrite(led3, yLedState);
+    digitalWrite(led4, wLedState);
+    digitalWrite(led5, yLedState);
+    roundCount++;
+  }  
+  
 }
+
+int getState(int testLed)
+{
+      int ledState;
+      if (testLed == LOW) {
+      ledState = HIGH;
+    } else {
+      ledState = LOW;
+    }
+    return ledState;
+}
+
