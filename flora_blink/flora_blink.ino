@@ -4,10 +4,11 @@ int led3 = 12;
 int led4 = 6;
 int led5 = 1;
 unsigned long prevMillis = 0;
-long interval = 200;
+long interval = 100;
 int yLedState = HIGH;
 int wLedState = LOW;
 int roundCount = 0;
+int dir = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -20,11 +21,18 @@ void setup() {
 }
 
 // the loop routine runs over and over again forever:
-void loop() {
-
-  unsigned long currMillis = millis();  
+void loop() 
+{
+ unsigned long currMillis = millis();  
   if (currMillis - prevMillis >= interval)
-  {    
+  {
+    alternate();
+    prevMillis = currMillis;
+  }
+}
+
+void alternate()
+{     
     if (yLedState == HIGH)
     {
       yLedState = LOW;
@@ -35,13 +43,23 @@ void loop() {
       yLedState = HIGH;
       wLedState = LOW;
     }
-    prevMillis = currMillis;
-    if (roundCount == 3)
+    
+    if (roundCount == 2)
     {
-      interval = interval + 100;
-      if (interval >= 4000)
+      int timeInc = 0;
+      if (dir == 0)
       {
-        interval = 200;      
+        timeInc = 100; 
+      }
+      else
+      {
+        timeInc = -100;
+      }
+      interval = interval + timeInc;
+      if (interval >= 1000 | interval <= 100)
+      {
+        if (dir == 0){dir = 1;}
+        else{dir = 0;}     
       }
       roundCount = 0;    
     }  
@@ -50,9 +68,7 @@ void loop() {
     digitalWrite(led3, yLedState);
     digitalWrite(led4, wLedState);
     digitalWrite(led5, yLedState);
-    roundCount++;
-  }  
-  
+    roundCount++;   
 }
 
 int getState(int testLed)
