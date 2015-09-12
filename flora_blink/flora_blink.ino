@@ -15,7 +15,7 @@ int altCount = 0;     //number of alt cycles performed
 int sweepCount = 0;   //number of sweeps performed
 int dir = 0;          //pos-neg direction of time interval increment
 int cycleCount = 0;   //number of times a blink program has run
-int progMode = 0;
+int progMode = 0;     //location in series of programs
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -24,11 +24,6 @@ void setup() {
   {
     pinMode(ledArray[pin], OUTPUT);
   }
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
-  pinMode(led4, OUTPUT);     
-  pinMode(led5, OUTPUT);     
 }
 
 // the loop routine runs over and over again forever:
@@ -62,51 +57,43 @@ void loop()
 }
 
 void alternate()
-{         
-    if (yLedState == HIGH)
+{           
+  yLedState = ! yLedState;
+  wLedState = ! wLedState;
+    
+  if (altCount == 2)
+  {
+    int timeInc = 0;
+    if (dir == 0)
     {
-      yLedState = LOW;
-      wLedState = HIGH;
+      timeInc = 100; 
     }
     else
     {
-      yLedState = HIGH;
-      wLedState = LOW;
+      timeInc = -100;
     }
+    interval = interval + timeInc;
+    if (interval >= 1000 | interval <= 100)
+    {
+      if (dir == 0){dir = 1;}
+      else{dir = 0;}
+      cycleCount++;     
+    }
+    altCount = 0;    
+  }  
+  for(int led = 0; led < ledCount; led++)
+  {
     
-    if (altCount == 2)
-    {
-      int timeInc = 0;
-      if (dir == 0)
-      {
-        timeInc = 100; 
-      }
-      else
-      {
-        timeInc = -100;
-      }
-      interval = interval + timeInc;
-      if (interval >= 1000 | interval <= 100)
-      {
-        if (dir == 0){dir = 1;}
-        else{dir = 0;}
-        cycleCount++;     
-      }
-      altCount = 0;    
-    }  
-    for(int led = 0; led < ledCount; led++)
-    {
-      
-     if (led % 2 == 0)
-     {
-        digitalWrite(ledArray[led], wLedState); 
-     }
-     else
-     {
-        digitalWrite(ledArray[led], yLedState);
-     }
-    }
-    altCount++;   
+   if (led % 2 == 0)
+   {
+    digitalWrite(ledArray[led], wLedState); 
+   }
+   else
+   {
+    digitalWrite(ledArray[led], yLedState);
+   }
+  }
+  altCount++;     
 }
 
 void sweep()
@@ -138,16 +125,16 @@ void chooseLine(int onLine)
 {
   for(int i = 0; i < ledCount; i++)
   {
-      int ledState = LOW;
-      if (i == onLine | i == onLine - 1 | i == onLine + 1)
-      {
-        ledState = HIGH;
-      }
-      else
-      {
-        ledState = LOW;
-      }
-      digitalWrite(ledArray[i], ledState);        
+    int ledState = LOW;
+    if (i == onLine | i == onLine - 1 | i == onLine + 1)
+    {
+      ledState = HIGH;
+    }
+    else
+    {
+      ledState = LOW;
+    }
+    digitalWrite(ledArray[i], ledState);        
   }
 }
 
