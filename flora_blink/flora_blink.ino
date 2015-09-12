@@ -9,6 +9,8 @@ int yLedState = HIGH;
 int wLedState = LOW;
 int roundCount = 0;
 int dir = 0;
+int cycleCount = 0;
+int progMode = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -23,12 +25,31 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() 
 {
- unsigned long currMillis = millis();  
-  if (currMillis - prevMillis >= interval)
-  {
-    alternate();
-    prevMillis = currMillis;
+ while (cycleCount < 2)
+ {
+   unsigned long currMillis = millis();  
+    if (currMillis - prevMillis >= interval)
+    {
+      if (progMode == 0)
+      {
+        alternate();
+      }
+      else
+      {
+        digitalWrite(led3, HIGH);
+        digitalWrite(led2, HIGH);
+        delay(1000);
+        cycleCount++;
+      }      
+      prevMillis = currMillis;      
+    }    
   }
+  progMode++;
+  if (progMode > 2)
+  {
+    progMode = 0;
+  }
+  cycleCount = 0;
 }
 
 void alternate()
@@ -59,7 +80,8 @@ void alternate()
       if (interval >= 1000 | interval <= 100)
       {
         if (dir == 0){dir = 1;}
-        else{dir = 0;}     
+        else{dir = 0;}
+        cycleCount++;     
       }
       roundCount = 0;    
     }  
