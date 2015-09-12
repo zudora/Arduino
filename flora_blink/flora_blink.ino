@@ -199,6 +199,44 @@ void chooseLine(int onLine)
 
 void accel(int accelArray[])
 {
+  // x values max out around +-5000
+  // y values as high as 7000
+
+  //Choose line to light up based on x value
+  int onLine;
+  if (accelArray[0] < -3000)
+  {
+    onLine = 0;
+  }
+  else if (accelArray[0] < -1000)
+  {
+    onLine = 1;  
+  }
+  else if (accelArray[0] < 100)
+  {
+    onLine = 2;  
+  }  
+  else if (accelArray[0] < 1000)
+  {
+    onLine = 3;  
+  }
+    else
+  {
+    onLine = 4;  
+  }
   
+  for(int i = 0; i < ledCount; i++)
+  {
+    int ledState = LOW;
+    if (i == onLine)
+    {
+      ledState = HIGH;
+    }
+    else
+    {
+      ledState = LOW;
+    }
+    digitalWrite(ledArray[i], ledState);        
+  }
 }
 
