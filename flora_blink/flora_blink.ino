@@ -42,10 +42,12 @@ void loop()
       if (progMode == 0)
       {
         //alternate();
+        interval = 100;
         cycleCount = 2;   //keeps this prog from running
       }
       else
       {
+        interval = 50;
         sweep();        
       }      
       prevMillis = currMillis;      
@@ -94,6 +96,7 @@ void alternate()
     }  
     for(int led = 0; led < ledCount; led++)
     {
+      
      if (led % 2 == 0)
      {
         digitalWrite(ledArray[led], wLedState); 
@@ -112,36 +115,33 @@ void sweep()
   int onLine = 0;
   while (onLine < 5)
   { 
-    for(int i = 0; i < ledCount; i++)
-    {
-        int ledState = LOW;
-        if (i == onLine)
-        {
-          ledState = HIGH;
-        }
-        else
-        {
-          ledState = LOW;
-        }
-        digitalWrite(ledArray[i], ledState);        
-    }
+    chooseLine(onLine);
     delay(200);
     onLine++;
   }
+  while (onLine >= 0)
+  { 
+    chooseLine(onLine);
+    delay(200);
+    onLine--;
+  }  
   cycleCount++;
 }
 
-int getState(int testLed)
+void chooseLine(int onLine)
 {
-    int ledState;
-    if (testLed == LOW) 
-    {
-      ledState = HIGH;
-    } 
-    else 
-    {
-      ledState = LOW;
-    }
-    return ledState;
+  for(int i = 0; i < ledCount; i++)
+  {
+      int ledState = LOW;
+      if (i == onLine | i == onLine - 1 | i == onLine + 1)
+      {
+        ledState = HIGH;
+      }
+      else
+      {
+        ledState = LOW;
+      }
+      digitalWrite(ledArray[i], ledState);        
+  }
 }
 
