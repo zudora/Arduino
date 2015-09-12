@@ -3,18 +3,27 @@ int led2 = 10;
 int led3 = 12;
 int led4 = 6;
 int led5 = 1;
+
+int ledCount = 5;
+int ledArray[] = {led1, led2, led3, led4, led5};
+
 unsigned long prevMillis = 0;
 long interval = 100;
 int yLedState = HIGH;
 int wLedState = LOW;
-int roundCount = 0;
-int dir = 0;
-int cycleCount = 0;
+int altCount = 0;     //number of alt cycles performed
+int sweepCount = 0;   //number of sweeps performed
+int dir = 0;          //pos-neg direction of time interval increment
+int cycleCount = 0;   //number of times a blink program has run
 int progMode = 0;
 
 // the setup routine runs once when you press reset:
 void setup() {                
   // initialize the digital pin as an output.
+  for(int pin = 0; pin < ledCount; pin++)
+  {
+    pinMode(ledArray[pin], OUTPUT);
+  }
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
@@ -39,7 +48,7 @@ void loop()
         digitalWrite(led3, HIGH);
         digitalWrite(led2, HIGH);
         delay(1000);
-        cycleCount++;
+        sweep();        
       }      
       prevMillis = currMillis;      
     }    
@@ -53,7 +62,7 @@ void loop()
 }
 
 void alternate()
-{     
+{         
     if (yLedState == HIGH)
     {
       yLedState = LOW;
@@ -65,7 +74,7 @@ void alternate()
       wLedState = LOW;
     }
     
-    if (roundCount == 2)
+    if (altCount == 2)
     {
       int timeInc = 0;
       if (dir == 0)
@@ -83,14 +92,35 @@ void alternate()
         else{dir = 0;}
         cycleCount++;     
       }
-      roundCount = 0;    
+      altCount = 0;    
     }  
-    digitalWrite(led1, yLedState);
-    digitalWrite(led2, wLedState);
-    digitalWrite(led3, yLedState);
-    digitalWrite(led4, wLedState);
-    digitalWrite(led5, yLedState);
-    roundCount++;   
+    for(int led = 0; led < ledCount; led++)
+    {
+     if (led % 2 == 0)
+     {
+      digitalWrite(ledArray[led], wLedState); 
+     }
+     else
+     {
+      digitalWrite(ledArray[led], yLedState);
+     }
+    }
+    //digitalWrite(led1, yLedState);
+    //digitalWrite(led2, wLedState);
+    //digitalWrite(led3, yLedState);
+    //digitalWrite(led4, wLedState);
+    //digitalWrite(led5, yLedState);
+    altCount++;   
+}
+
+void sweep()
+{
+  // Turn on each line in turn
+  for(int i = 0; i < 5; i++)
+  {
+      
+  }
+  cycleCount++;
 }
 
 int getState(int testLed)
