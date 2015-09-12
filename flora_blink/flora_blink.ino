@@ -18,12 +18,17 @@ int yLedState = HIGH;
 int wLedState = LOW;
 int altCount = 0;     //number of alt cycles performed
 int sweepCount = 0;   //number of sweeps performed
+int senseCount = 0;   //number of sensor cycles 
 int dir = 0;          //pos-neg direction of time interval increment
 int cycleCount = 0;   //number of times a blink program has run
 int progMode = 0;     //location in series of programs
 
 //accelerometer
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
+int xAccel;
+int yAccel;
+int zAccel;
+int accelArray[3];
 
 
 // the setup routine runs once when you press reset:
@@ -73,9 +78,31 @@ void loop()
         cycleCount = 2;  //keeps this prog from running              
       }
       else
-      {   
-        accelStart = millis();
-        accel();
+      {           
+        while (senseCount < 50)
+        {
+          // Read the 'raw' data in 14-bit counts
+          mma.read();
+//          Serial.print("X:\t"); Serial.print(mma.x); 
+//          Serial.print("\tY:\t"); Serial.print(mma.y); 
+//          Serial.print("\tZ:\t"); Serial.print(mma.z); 
+//          Serial.println();
+          accelArray[0] = mma.x;        
+          accelArray[1] = mma.y;
+          accelArray[2] = mma.z;
+
+          Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
+          Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
+          Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
+          Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
+          Serial.println();
+          
+          accel(accelArray);
+                    
+          delay(500);
+          senseCount++;
+        }
+        
       }      
       prevMillis = currMillis;      
     }    
@@ -170,59 +197,8 @@ void chooseLine(int onLine)
   }
 }
 
-void accel()
+void accel(int accelArray[])
 {
-  while (millis() - accelStart < 8000)
-  {
-    // Read the 'raw' data in 14-bit counts
-    mma.read();
-    Serial.print("X:\t"); Serial.print(mma.x); 
-    Serial.print("\tY:\t"); Serial.print(mma.y); 
-    Serial.print("\tZ:\t"); Serial.print(mma.z); 
-    Serial.println();
-    
   
-    /* Get a new sensor event */ 
-    sensors_event_t event; 
-    mma.getEvent(&event);
-  
-    /* Display the results (acceleration is measured in m/s^2) */
-    Serial.print("X: \t"); Serial.print(event.acceleration.x); Serial.print("\t");
-    Serial.print("Y: \t"); Serial.print(event.acceleration.y); Serial.print("\t");
-    Serial.print("Z: \t"); Serial.print(event.acceleration.z); Serial.print("\t");
-    Serial.println("m/s^2 ");
-    
-    /* Get the orientation of the sensor */
-    uint8_t o = mma.getOrientation();
-    
-    switch (o) {
-      case MMA8451_PL_PUF: 
-        Serial.println("Portrait Up Front");
-        break;
-      case MMA8451_PL_PUB: 
-        Serial.println("Portrait Up Back");
-        break;    
-      case MMA8451_PL_PDF: 
-        Serial.println("Portrait Down Front");
-        break;
-      case MMA8451_PL_PDB: 
-        Serial.println("Portrait Down Back");
-        break;
-      case MMA8451_PL_LRF: 
-        Serial.println("Landscape Right Front");
-        break;
-      case MMA8451_PL_LRB: 
-        Serial.println("Landscape Right Back");
-        break;
-      case MMA8451_PL_LLF: 
-        Serial.println("Landscape Left Front");
-        break;
-      case MMA8451_PL_LLB: 
-        Serial.println("Landscape Left Back");
-        break;
-      }
-    Serial.println();
-    delay(500);
-  }
 }
 
