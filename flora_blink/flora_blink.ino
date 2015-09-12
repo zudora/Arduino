@@ -13,7 +13,8 @@ int ledArray[] = {led1, led2, led3, led4, led5};
 
 unsigned long prevMillis = 0;
 unsigned long accelStart = 0;
-long interval = 100;
+long interval = 200;
+long sweepInterval = 200;
 int yLedState = HIGH;
 int wLedState = LOW;
 int altCount = 0;     //number of alt cycles performed
@@ -60,33 +61,42 @@ void setup() {
 // the loop routine runs over and over again forever:
 void loop() 
 {
- while (cycleCount < 2)
+ while (cycleCount < 1)
  {
    unsigned long currMillis = millis();  
     if (currMillis - prevMillis >= interval)
     {
       if (progMode == 0)
-      {
-        interval = 100;
-        //alternate();               
-        cycleCount = 2;   //keeps this prog from running
+      {        
+        alternate();               
+        //cycleCount = 2;   //keeps this prog from running
       }
       else if (progMode == 1)
-      { 
-        interval = 200;     
-        //sweep();
-        cycleCount = 2;  //keeps this prog from running              
+      {                
+       sweep();
+       
+       //indicate done with this by flashing
+       
+       for(int led = 0; led < ledCount; led++)
+       {                        
+        digitalWrite(ledArray[led], HIGH); 
+       }
+       delay(200); 
+       for(int led = 0; led < ledCount; led++)
+       {                        
+        digitalWrite(ledArray[led], LOW); 
+       }
+       delay(200);             
+       
+       //cycleCount = 2; //keeps this prog from running
       }
+      
       else
       {           
-        while (senseCount < 50)
+        while (senseCount < 20)
         {
           // Read the 'raw' data in 14-bit counts
           mma.read();
-//          Serial.print("X:\t"); Serial.print(mma.x); 
-//          Serial.print("\tY:\t"); Serial.print(mma.y); 
-//          Serial.print("\tZ:\t"); Serial.print(mma.z); 
-//          Serial.println();
           accelArray[0] = mma.x;        
           accelArray[1] = mma.y;
           accelArray[2] = mma.z;
@@ -102,25 +112,29 @@ void loop()
           delay(500);
           senseCount++;
         }
-        
+        cycleCount = 2;
+        interval = 200;             
       }      
       prevMillis = currMillis;      
     }    
   }
   progMode++;
-  if (progMode > 3)
+  if (progMode > 2)
   {
     progMode = 0;
   }
-  cycleCount = 0;
+  //reset all counts
+  cycleCount = 0;  
+  altCount = 0;     //number of alt cycles performed
+  sweepCount = 0;   //number of sweeps performed
+  senseCount = 0;   //number of sensor cycles 
 }
 
 void alternate()
 {           
   yLedState = ! yLedState;
-  wLedState = ! wLedState;
-    
-  if (altCount == 2)
+  wLedState = ! wLedState;    
+  if (altCount == 4) //have gone through two passes of alternate() at a certain interval
   {
     int timeInc = 0;
     if (dir == 0)
@@ -132,7 +146,7 @@ void alternate()
       timeInc = -100;
     }
     interval = interval + timeInc;
-    if (interval >= 1000 | interval <= 100)
+    if (interval >= 800 | interval <= 100)
     {
       if (dir == 0){dir = 1;}
       else{dir = 0;}
@@ -141,8 +155,7 @@ void alternate()
     altCount = 0;    
   }  
   for(int led = 0; led < ledCount; led++)
-  {
-    
+  {    
    if (led % 2 == 0)
    {
     digitalWrite(ledArray[led], wLedState); 
@@ -158,7 +171,7 @@ void alternate()
 void sweep()
 {  
   // Turn on each line in turn
-  while (sweepCount < 10)
+  while (sweepCount < 2)    //default 10
   {
     int onLine = -1;
     while (onLine < 5)
