@@ -2,11 +2,11 @@
 #include <Adafruit_MMA8451.h>
 #include <Adafruit_Sensor.h>
 
-int led1 = 9;
+int led1 = 1;
 int led2 = 10;
-int led3 = 12;
+int led3 = 9;
 int led4 = 6;
-int led5 = 1;
+int led5 = 12;
 
 int ledCount = 5;
 int ledArray[] = {led1, led2, led3, led4, led5};
@@ -30,7 +30,6 @@ int xAccel;
 int yAccel;
 int zAccel;
 int accelArray[3];
-
 
 // the setup routine runs once when you press reset:
 void setup() {                
@@ -68,29 +67,12 @@ void loop()
     {
       if (progMode == 0)
       {        
-        alternate();               
-        //cycleCount = 2;   //keeps this prog from running
+        alternate();                 
       }
       else if (progMode == 1)
       {                
        sweep();
-       
-       //indicate done with this by flashing
-       
-       for(int led = 0; led < ledCount; led++)
-       {                        
-        digitalWrite(ledArray[led], HIGH); 
-       }
-       delay(200); 
-       for(int led = 0; led < ledCount; led++)
-       {                        
-        digitalWrite(ledArray[led], LOW); 
-       }
-       delay(200);             
-       
-       //cycleCount = 2; //keeps this prog from running
       }
-      
       else
       {           
         while (senseCount < 20)
@@ -101,11 +83,11 @@ void loop()
           accelArray[1] = mma.y;
           accelArray[2] = mma.z;
 
-          Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
-          Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
-          Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
-          Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
-          Serial.println();
+          //Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
+          //Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
+          //Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
+          //Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
+          //Serial.println();
           
           accel(accelArray);
                     
@@ -124,7 +106,9 @@ void loop()
     progMode = 0;
   }
   //reset all counts
-  cycleCount = 0;  
+  cycleCount = 0;
+  interval = 200;
+  sweepInterval = 200;  
   altCount = 0;     //number of alt cycles performed
   sweepCount = 0;   //number of sweeps performed
   senseCount = 0;   //number of sensor cycles 
@@ -134,7 +118,7 @@ void alternate()
 {           
   yLedState = ! yLedState;
   wLedState = ! wLedState;    
-  if (altCount == 4) //have gone through two passes of alternate() at a certain interval
+  if (altCount == 6) //have gone through two passes of alternate() at a certain interval
   {
     int timeInc = 0;
     if (dir == 0)
@@ -217,11 +201,12 @@ void accel(int accelArray[])
 
   //Choose line to light up based on x value
   int onLine;
-  if (accelArray[0] < -3000)
+
+  if (accelArray[0] < -1000)
   {
     onLine = 0;
   }
-  else if (accelArray[0] < -1000)
+  else if (accelArray[0] < -100)
   {
     onLine = 1;  
   }
