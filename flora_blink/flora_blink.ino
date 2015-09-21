@@ -13,6 +13,7 @@ int ledArray[] = {led1, led2, led3, led4, led5};
 
 unsigned long prevMillis = 0;
 unsigned long accelStart = 0;
+unsigned long currMillis;
 long interval = 200;
 long sweepInterval = 200;
 int yLedState = HIGH;
@@ -62,44 +63,60 @@ void loop()
 {
  while (cycleCount < 1)
  {
-   unsigned long currMillis = millis();  
-    if (currMillis - prevMillis >= interval)
-    {
-      if (progMode == 0)
-      {        
-        alternate();                 
-      }
-      else if (progMode == 1)
-      {                
-       sweep();
-      }
-      else
-      {           
-        while (senseCount < 20)
+   currMillis = millis();  
+   if (currMillis - prevMillis >= interval)
+   {
+    if (progMode == 0)
+    {        
+      dir = 0;
+      alternate();                 
+    }
+    else if (progMode == 1)
+    {                
+     sweep();
+    }
+    else
+    {           
+        for (int flash = 0; flash < 2; flash++)
         {
-          // Read the 'raw' data in 14-bit counts
-          mma.read();
-          accelArray[0] = mma.x;        
-          accelArray[1] = mma.y;
-          accelArray[2] = mma.z;
-
-          //Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
-          //Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
-          //Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
-          //Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
-          //Serial.println();
-          
-          accel(accelArray);
-                    
+          digitalWrite(led3, HIGH);
           delay(500);
-          senseCount++;
+          digitalWrite(led3, LOW);
+          delay(500);
         }
-        cycleCount = 2;
-        interval = 200;             
-      }      
-      prevMillis = currMillis;      
-    }    
+        
+        while (senseCount < 50)
+        {
+        // Read the 'raw' data in 14-bit counts
+        mma.read();
+        accelArray[0] = mma.x;        
+        accelArray[1] = mma.y;
+        accelArray[2] = mma.z;
+
+        //Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
+        //Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
+        //Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
+        //Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
+        //Serial.println();
+        
+        accel(accelArray);
+                  
+        delay(500);
+        senseCount++;
+      }
+        cycleCount = 2;                    
+    }      
+    prevMillis = currMillis;      
+   }    
   }
+  
+  for(int led = 0; led < ledCount; led++)
+  {    
+    digitalWrite(ledArray[led], LOW); 
+  }
+  delay(500);
+
+  prevMillis = currMillis;      
   progMode++;
   if (progMode > 2)
   {
@@ -130,7 +147,7 @@ void alternate()
       timeInc = -100;
     }
     interval = interval + timeInc;
-    if (interval >= 800 | interval <= 100)
+    if (interval >= 900 | interval <= 100)
     {
       if (dir == 0){dir = 1;}
       else{dir = 0;}
@@ -155,7 +172,7 @@ void alternate()
 void sweep()
 {  
   // Turn on each line in turn
-  while (sweepCount < 2)    //default 10
+  while (sweepCount < 4)    //default 10
   {
     int onLine = -1;
     while (onLine < 5)
@@ -202,19 +219,19 @@ void accel(int accelArray[])
   //Choose line to light up based on x value
   int onLine;
 
-  if (accelArray[0] < -1000)
+  if (accelArray[0] < -1400)
   {
     onLine = 0;
   }
-  else if (accelArray[0] < -100)
+  else if (accelArray[0] < -400)
   {
     onLine = 1;  
   }
-  else if (accelArray[0] < 100)
+  else if (accelArray[0] < 400)
   {
     onLine = 2;  
   }  
-  else if (accelArray[0] < 1000)
+  else if (accelArray[0] < 1400)
   {
     onLine = 3;  
   }
