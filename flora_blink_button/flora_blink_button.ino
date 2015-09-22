@@ -90,64 +90,7 @@ void loop()
       switch(sequence)
       {
         case 0:
-          //Alternate
-          if (cycleCount <= 2)
-          {
-            // If it's the first round, set up alternation
-            if (altCount == 0)
-            {
-             for (int led = 0; led < ledCount; led++)
-             {
-              if (led % 2 == 0)
-              {
-                 digitalWrite(ledArray[led], LOW);
-              }
-              else
-              {
-                digitalWrite(ledArray[led], HIGH);
-              }
-             }
-            }            
-            else
-            {
-              for (int led = 0; led < ledCount; led++)
-              {
-                if (stateArray[led] == LOW)
-                {
-                  digitalWrite(ledArray[led], HIGH);                  
-                }               
-                else
-                {
-                  digitalWrite(ledArray[led], LOW);
-                }
-              }
-            }
-            // change interval every third round
-            if (altCount % 3) == 0
-            {
-             interval = interval + (timeDir * 100);
-            }
-            altCount ++;            
-            if (altCount == 9)
-            {
-              // Change time interval direction
-              timeDir = -1;
-            }
-            if (altCount == 24)
-            {
-             // finished a cycle. Increment
-             cycleCount++; 
-             timeDir = 1;
-            }
-          }
-          else
-          {
-            // Go to pause
-            sequence = 3;
-            cycleCount = 0;
-            timeDir = 1;
-            altCount = 0;
-          }
+          alternate();
           break;
           
         case 1:
@@ -177,7 +120,7 @@ void loop()
             }
             
             // change interval every third round
-            if (sweepCount % 2) == 0
+            if (sweepCount % 2 == 0)
             {
              interval = interval + (timeDir * 100);
             }
@@ -248,13 +191,69 @@ void loop()
           break;
           
         break;
-      }
-      
-    
-    // if done with cycles, increment sequence
+      }          
   }  
- 
- 
+} 
+void alternate()
+{
+  if (cycleCount <= 2)
+  {
+    // If it's the first round, set up alternation
+    if (altCount == 0)
+    {
+     for (int led = 0; led < ledCount; led++)
+     {
+      if (led % 2 == 0)
+      {
+         digitalWrite(ledArray[led], LOW);
+      }
+      else
+      {
+        digitalWrite(ledArray[led], HIGH);
+      }
+     }
+    }            
+    else
+    {
+      for (int led = 0; led < ledCount; led++)
+      {
+        if (stateArray[led] == LOW)
+        {
+          digitalWrite(ledArray[led], HIGH);                  
+        }               
+        else
+        {
+          digitalWrite(ledArray[led], LOW);
+        }
+      }
+    }
+    // change interval every third round
+    if (altCount % 3 == 0)
+    {
+     interval = interval + (timeDir * 100);
+    }
+    altCount ++;            
+    if (altCount == 9)
+    {
+      // Change time interval direction
+      timeDir = -1;
+    }
+    if (altCount == 24)
+    {
+     // finished a cycle. Increment
+     cycleCount++; 
+     timeDir = 1;
+    }
+  }
+  else
+  {
+    // Go to pause
+    sequence = 3;
+    cycleCount = 0;
+    timeDir = 1;
+    altCount = 0;
+  }
+}          
  
  // Data for Sweep
  //   Sequence number
@@ -267,31 +266,7 @@ void loop()
  //   Interval
  //   Current light state
 
-------------------------------------------------------------------------------------------
 
-// while (cycleCount < 1)
-// {
-//   currMillis = millis();  
-//   if (currMillis - prevMillis >= interval)
-//   {
-//    if (progMode == 0)
-//    {        
-//      dir = 0;
-//      alternate();                 
-//    }
-//    else if (progMode == 1)
-//    {                
-//     sweep();
-//    }
-//    else
-//    {           
-//        for (int flash = 0; flash < 2; flash++)
-//        {
-//          digitalWrite(led3, HIGH);
-//          delay(500);
-//          digitalWrite(led3, LOW);
-//          delay(500);
-//        }
 //        
 //        while (senseCount < 50)
 //        {
@@ -461,5 +436,5 @@ void loop()
 //    }
 //    digitalWrite(ledArray[i], ledState);        
 //  }
-}
+
 
