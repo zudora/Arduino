@@ -26,7 +26,7 @@ int pauseRepeats = 0; //number of times to run pause routine
 int altCount = 0;     //number of alt cycles performed
 int sweepCount = 0;   //number of sweeps performed
 int sweepDir = 1;     //direction of sweep
-int prevLine = -1;     //last center line on sweep
+int prevLine = -2;     //last center line on sweep
 int senseCount = 0;   //number of sensor cycles 
 
 unsigned long accelStart = 0;
@@ -76,9 +76,6 @@ void loop()
  //       cycleCount: Count of runs of this sequence. Reset to 0 each time sequence changes. Each sequence has its own desired number of repeats 
  //       interval: current delay used in current sequence
 
- 
- 
- 
  // Check current time
  currMillis = millis();
  
@@ -125,16 +122,18 @@ void loop()
                 }
               }
             }
-            // change interval
-            interval = interval + (timeDir * 100);
-            
+            // change interval every third round
+            if (altCount % 3) == 0
+            {
+             interval = interval + (timeDir * 100);
+            }
             altCount ++;            
-            if (altCount == 10)
+            if (altCount == 9)
             {
               // Change time interval direction
               timeDir = -1;
             }
-            if (altCount == 20)
+            if (altCount == 24)
             {
              // finished a cycle. Increment
              cycleCount++; 
@@ -177,17 +176,23 @@ void loop()
               sweepDir = -sweepDir;
             }
             
+            // change interval every third round
+            if (sweepCount % 2) == 0
+            {
+             interval = interval + (timeDir * 100);
+            }
+                        
             if (sweepCount == 10)
             {
                timeDir = -1;
             }
+            
             if (sweepCount == 20)
             {
               cycleCount++;
               timeDir = 1;
               sweepDir = 1;
-            }
-            
+            }            
             prevLine = nextLine;                       
           }
           else
@@ -198,7 +203,7 @@ void loop()
             sweepCount = 0;
             timeDir = 1;
             sweepDir = 1;
-            prevLine = -1;
+            prevLine = -2;
           }
           break;
           
@@ -206,6 +211,7 @@ void loop()
           // Sensor
           if (cycleCount <= 20)
           {
+            
             cycleCount++; 
           }
           else
