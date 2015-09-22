@@ -26,6 +26,7 @@ int pauseRepeats = 0; //number of times to run pause routine
 int altCount = 0;     //number of alt cycles performed
 int sweepCount = 0;   //number of sweeps performed
 int sweepDir = 1;     //direction of sweep
+int prevLine = -1;     //last center line on sweep
 int senseCount = 0;   //number of sensor cycles 
 
 unsigned long accelStart = 0;
@@ -98,7 +99,7 @@ void loop()
             // If it's the first round, set up alternation
             if (altCount == 0)
             {
-             for (int led = 0; led <= ledCount; led++)
+             for (int led = 0; led < ledCount; led++)
              {
               if (led % 2 == 0)
               {
@@ -112,7 +113,7 @@ void loop()
             }            
             else
             {
-              for (int led = 0; led <= ledCount; led++)
+              for (int led = 0; led < ledCount; led++)
               {
                 if (stateArray[led] == LOW)
                 {
@@ -153,18 +154,56 @@ void loop()
         case 1:
           // Sweep
           if (cycleCount <= 2)
-          {
+          {                                   
+            int nextLine = prevLine + sweepDir;
             
-            cycleCount++; 
+            if (nextLine < ledCount && nextLine >= 0)
+            {
+              for (int led = 0; led < ledCount; led++)
+              {
+                if (nextLine - 1 <= led && led <= nextLine + 1)
+                {
+                  digitalWrite(ledArray[led], HIGH);
+                }
+                else
+                {
+                  digitalWrite(ledArray[led], LOW);
+                }                       
+              }              
+            }
+            else
+            {
+              //this round, don't update lights, just hold and change sweep direction
+              sweepDir = -sweepDir;
+            }
+            
+            if (sweepCount == 10)
+            {
+               timeDir = -1;
+            }
+            if (sweepCount == 20)
+            {
+              cycleCount++;
+              timeDir = 1;
+              sweepDir = 1;
+            }
+            
+            prevLine = nextLine;                       
           }
           else
           {
             // Go to pause
             sequence = 3;
+            cycleCount = 0;
+            sweepCount = 0;
+            timeDir = 1;
+            sweepDir = 1;
+            prevLine = -1;
           }
           break;
           
         case 2:
+          // Sensor
           if (cycleCount <= 20)
           {
             cycleCount++; 
@@ -184,7 +223,7 @@ void loop()
           if (cycleCount <= pauseRepeats)
           {
            // Set lights low
-           for (int led = 0; led <= ledCount; led++)
+           for (int led = 0; led < ledCount; led++)
            {
             if (ledArray[led] != LOW)
             {
@@ -222,12 +261,8 @@ void loop()
  //   Interval
  //   Current light state
 
+------------------------------------------------------------------------------------------
 
-
-
-
-
- 
 // while (cycleCount < 1)
 // {
 //   currMillis = millis();  
@@ -314,7 +349,7 @@ void loop()
 //      timeInc = -100;
 //    }
 //    interval = interval + timeInc;
-//    if (interval >= 900 | interval <= 100)
+//    if (interval >= 900 || interval <= 100)
 //    {
 //      if (dir == 0){dir = 1;}
 //      else{dir = 0;}
@@ -366,7 +401,7 @@ void loop()
 //  for(int i = 0; i < ledCount; i++)
 //  {
 //    int ledState = LOW;
-//    if (i == onLine | i == onLine - 1 | i == onLine + 1)
+//    if (i == onLine || i == onLine - 1 || i == onLine + 1)
 //    {
 //      ledState = HIGH;
 //    }
