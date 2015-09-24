@@ -29,13 +29,8 @@ int sweepDir = 1;     //direction of sweep
 int prevLine = -2;     //last center line on sweep
 int senseCount = 0;   //number of sensor cycles 
 
-unsigned long accelStart = 0;
-
 //accelerometer
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
-int xAccel;
-int yAccel;
-int zAccel;
 int accelArray[3];
 
 // the setup routine runs once when you press reset:
@@ -94,68 +89,26 @@ void loop()
           break;
           
         case 1:
-          // Sweep
-          if (cycleCount <= 2)
-          {                                   
-            int nextLine = prevLine + sweepDir;
-            
-            if (nextLine < ledCount && nextLine >= 0)
-            {
-              for (int led = 0; led < ledCount; led++)
-              {
-                if (nextLine - 1 <= led && led <= nextLine + 1)
-                {
-                  digitalWrite(ledArray[led], HIGH);
-                }
-                else
-                {
-                  digitalWrite(ledArray[led], LOW);
-                }                       
-              }              
-            }
-            else
-            {
-              //this round, don't update lights, just hold and change sweep direction
-              sweepDir = -sweepDir;
-            }
-            
-            // change interval every third round
-            if (sweepCount % 2 == 0)
-            {
-             interval = interval + (timeDir * 100);
-            }
-                        
-            if (sweepCount == 10)
-            {
-               timeDir = -1;
-            }
-            
-            if (sweepCount == 20)
-            {
-              cycleCount++;
-              timeDir = 1;
-              sweepDir = 1;
-            }            
-            prevLine = nextLine;                       
-          }
-          else
-          {
-            // Go to pause
-            sequence = 3;
-            cycleCount = 0;
-            sweepCount = 0;
-            timeDir = 1;
-            sweepDir = 1;
-            prevLine = -2;
-          }
+          sweep();         
           break;
           
         case 2:
           // Sensor
           if (cycleCount <= 20)
-          {
+          {            
+            // Read the 'raw' data in 14-bit counts
+            mma.read();
+            accelArray[0] = mma.x;        
+            accelArray[1] = mma.y;
+            accelArray[2] = mma.z;
+    
+            //Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
+            //Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
+            //Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
+            //Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
+            //Serial.println();
             
-            cycleCount++; 
+            accel(accelArray);            
           }
           else
           {
@@ -188,8 +141,8 @@ void loop()
             // reset to default interval starting value 
             interval = 100;
           }
-          break;
-          
+          break;          
+        
         break;
       }          
   }  
@@ -254,6 +207,117 @@ void alternate()
     altCount = 0;
   }
 }          
+
+void sweep()
+{
+  if (cycleCount <= 2)
+  {                                   
+    int nextLine = prevLine + sweepDir;
+    
+    if (nextLine < ledCount && nextLine >= 0)
+    {
+      for (int led = 0; led < ledCount; led++)
+      {
+        if (nextLine - 1 <= led && led <= nextLine + 1)
+        {
+          digitalWrite(ledArray[led], HIGH);
+        }
+        else
+        {
+          digitalWrite(ledArray[led], LOW);
+        }                       
+      }              
+    }
+    else
+    {
+      //this round, don't update lights, just hold and change sweep direction
+      sweepDir = -sweepDir;
+    }
+    
+    // change interval every third round
+    if (sweepCount % 2 == 0)
+    {
+     interval = interval + (timeDir * 100);
+    }
+                
+    if (sweepCount == 10)
+    {
+       timeDir = -1;
+    }
+    
+    if (sweepCount == 20)
+    {
+      cycleCount++;
+      timeDir = 1;
+      sweepDir = 1;
+    }            
+    prevLine = nextLine;                       
+  }
+  else
+  {
+    // Go to pause
+    sequence = 3;
+    cycleCount = 0;
+    sweepCount = 0;
+    timeDir = 1;
+    sweepDir = 1;
+    prevLine = -2;
+  }
+}
+
+void accel(int accelArray[])
+{
+  if (cycleCount <= 50)
+  {
+    // x values max out around +-5000
+    // y values as high as 7000
+  
+    //Choose line to light up based on x value
+    int onLine;
+  
+    if (accelArray[0] < -1400)
+    {
+      onLine = 0;
+    }
+    else if (accelArray[0] < -400)
+    {
+      onLine = 1;  
+    }
+    else if (accelArray[0] < 400)
+    {
+      onLine = 2;  
+    }  
+    else if (accelArray[0] < 1400)
+    {
+      onLine = 3;  
+    }
+      else
+    {
+      onLine = 4;  
+    }
+    
+    for(int i = 0; i < ledCount; i++)
+    {
+      int ledState = LOW;
+      if (i == onLine)
+      {
+        ledState = HIGH;
+      }
+      else
+      {
+        ledState = LOW;
+      }
+      digitalWrite(ledArray[i], ledState);        
+    }
+    cycleCount++;
+  }
+  else
+  {
+    // Go to pause
+    sequence = 3;
+    cycleCount = 0;    
+  }
+}
  
  // Data for Sweep
  //   Sequence number
@@ -265,176 +329,5 @@ void alternate()
  //   Sequence number
  //   Interval
  //   Current light state
-
-
-//        
-//        while (senseCount < 50)
-//        {
-//        // Read the 'raw' data in 14-bit counts
-//        mma.read();
-//        accelArray[0] = mma.x;        
-//        accelArray[1] = mma.y;
-//        accelArray[2] = mma.z;
-
-        //Serial.print("X: \t"); Serial.print(accelArray[0]); Serial.print("\t");
-        //Serial.print("Y: \t"); Serial.print(accelArray[1]); Serial.print("\t");
-        //Serial.print("Z: \t"); Serial.print(accelArray[2]); Serial.print("\t");
-        //Serial.print("Count: \t"); Serial.print(senseCount); Serial.print("\t");
-        //Serial.println();
-        
-//        accel(accelArray);
-//                  
-//        delay(500);
-//        senseCount++;
-//      }
-//        cycleCount = 2;                    
-//    }      
-//    prevMillis = currMillis;      
-//   }    
-//  }
-//  
-//  for(int led = 0; led < ledCount; led++)
-//  {    
-//    digitalWrite(ledArray[led], LOW); 
-//  }
-//  delay(500);
-//
-//  prevMillis = currMillis;      
-//  progMode++;
-//  if (progMode > 2)
-//  {
-//    progMode = 0;
-//  }
-//  //reset all counts
-//  cycleCount = 0;
-//  interval = 200;
-//  sweepInterval = 200;  
-//  altCount = 0;     //number of alt cycles performed
-//  sweepCount = 0;   //number of sweeps performed
-//  senseCount = 0;   //number of sensor cycles 
-//}
-//
-//void alternate()
-//{           
-//  yLedState = ! yLedState;
-//  wLedState = ! wLedState;    
-//  if (altCount == 6) //have gone through two passes of alternate() at a certain interval
-//  {
-//    int timeInc = 0;
-//    if (dir == 0)
-//    {
-//      timeInc = 100; 
-//    }
-//    else
-//    {
-//      timeInc = -100;
-//    }
-//    interval = interval + timeInc;
-//    if (interval >= 900 || interval <= 100)
-//    {
-//      if (dir == 0){dir = 1;}
-//      else{dir = 0;}
-//      cycleCount++;     
-//    }
-//    altCount = 0;    
-//  }  
-//  for(int led = 0; led < ledCount; led++)
-//  {    
-//   if (led % 2 == 0)
-//   {
-//    digitalWrite(ledArray[led], wLedState); 
-//   }
-//   else
-//   {
-//    digitalWrite(ledArray[led], yLedState);
-//   }
-//  }
-//  altCount++;     
-//}
-//
-//void sweep()
-//{  
-//  // Turn on each line in turn
-//  while (sweepCount < 4)    //default 10
-//  {
-//    int onLine = -1;
-//    while (onLine < 5)
-//    { 
-//      chooseLine(onLine);
-//      delay(interval);
-//      onLine++;
-//    }
-//    while (onLine >= -1)
-//    { 
-//      chooseLine(onLine);
-//      delay(interval);
-//      onLine--;
-//    }
-//    interval = interval + 100;
-//    
-//    sweepCount++;
-//  }    
-//  cycleCount++;
-//}
-//
-//void chooseLine(int onLine)
-//{
-//  for(int i = 0; i < ledCount; i++)
-//  {
-//    int ledState = LOW;
-//    if (i == onLine || i == onLine - 1 || i == onLine + 1)
-//    {
-//      ledState = HIGH;
-//    }
-//    else
-//    {
-//      ledState = LOW;
-//    }
-//    digitalWrite(ledArray[i], ledState);        
-//  }
-//}
-//
-//void accel(int accelArray[])
-//{
-//  // x values max out around +-5000
-//  // y values as high as 7000
-//
-//  //Choose line to light up based on x value
-//  int onLine;
-//
-//  if (accelArray[0] < -1400)
-//  {
-//    onLine = 0;
-//  }
-//  else if (accelArray[0] < -400)
-//  {
-//    onLine = 1;  
-//  }
-//  else if (accelArray[0] < 400)
-//  {
-//    onLine = 2;  
-//  }  
-//  else if (accelArray[0] < 1400)
-//  {
-//    onLine = 3;  
-//  }
-//    else
-//  {
-//    onLine = 4;  
-//  }
-//  
-//  for(int i = 0; i < ledCount; i++)
-//  {
-//    int ledState = LOW;
-//    if (i == onLine)
-//    {
-//      ledState = HIGH;
-//    }
-//    else
-//    {
-//      ledState = LOW;
-//    }
-//    digitalWrite(ledArray[i], ledState);        
-//  }
 
 
