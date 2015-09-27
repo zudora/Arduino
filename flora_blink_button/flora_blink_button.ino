@@ -13,6 +13,7 @@ const int ledArray[] = {led1, led2, led3, led4, led5};
 
 int stateArray[] = {LOW, LOW, LOW, LOW, LOW};
 
+String stateString;
 unsigned long prevMillis = 0;
 unsigned long currMillis;
 long interval = 200;
@@ -28,6 +29,8 @@ int sweepCount = 0;   //number of sweeps performed
 int sweepDir = 1;     //direction of sweep
 int prevLine = -2;     //last center line on sweep
 int senseCount = 0;   //number of sensor cycles 
+
+bool firstRun = true;
 
 //accelerometer
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
@@ -61,7 +64,11 @@ void setup() {
 
 void loop() 
 {
-
+  if (firstRun == true)
+  {
+    delay(3000);
+  }
+  firstRun = false;
  // The loop runs over and over
  // Each run, it checks the state
  // Outer state variables and their effect:
@@ -71,24 +78,26 @@ void loop()
  //       cycleCount: Count of runs of this sequence. Reset to 0 each time sequence changes. Each sequence has its own desired number of repeats 
  //       interval: current delay used in current sequence
 
- // Check current time
- currMillis = millis();
+ // Check current time 
+ currMillis = millis(); 
  
  // Subtract last time; compare to interval
   if (currMillis - prevMillis >= interval)
-  {
+  {       
     // If it's equal or greater, update lights and state
       // Choose sequence
       
-      seqBookmark = sequence;
+      if (sequence != 3) seqBookmark = sequence;
       
       switch(sequence)
       {
         case 0:
+          //Serial.print("Seq 0: Alternate");Serial.print("\n");
           alternate();
           break;
           
         case 1:
+          Serial.print("Seq 0: Sweep");Serial.print("\n");
           sweep();         
           break;
           
@@ -142,23 +151,27 @@ void loop()
             interval = 100;
           }
           break;          
-        
+          
+        prevMillis = currMillis;
         break;
-      }          
-  }  
+      }                
+  }   
 } 
 void alternate()
 {
+  //Serial.print("Alternate cycleCount: ");Serial.print(cycleCount);Serial.print("\n");
   if (cycleCount <= 2)
   {
     // If it's the first round, set up alternation
+    //Serial.print("altCount: ");Serial.print(altCount);Serial.print("\n");
     if (altCount == 0)
     {
+    Serial.print("First run\n");     
      for (int led = 0; led < ledCount; led++)
      {
       if (led % 2 == 0)
       {
-         digitalWrite(ledArray[led], LOW);
+         digitalWrite(ledArray[led], LOW);         
       }
       else
       {
@@ -168,9 +181,10 @@ void alternate()
     }            
     else
     {
+     stateString.concat(stateString + "\t" + altCount + "\t");
       for (int led = 0; led < ledCount; led++)
       {
-        if (stateArray[led] == LOW)
+        if (ledArray[led] == LOW)
         {
           digitalWrite(ledArray[led], HIGH);                  
         }               
@@ -183,18 +197,27 @@ void alternate()
     // change interval every third round
     if (altCount % 3 == 0)
     {
-     interval = interval + (timeDir * 100);
+     //Serial.print("Mod\n");      
+     interval = interval + (timeDir * 100);     
     }
-    altCount ++;            
+    
+    altCount++;
+        
+    Serial.print(altCount); Serial.print("\n");
+                
     if (altCount == 9)
     {
+      Serial.print("Changing direction\n"); 
       // Change time interval direction
       timeDir = -1;
     }
     if (altCount == 24)
     {
+     Serial.print("finished a cycle. Increment\n"); 
      // finished a cycle. Increment
      cycleCount++; 
+     //resetting this value to zero breaks everything. The initial steps never execute
+     altCount = 0;
      timeDir = 1;
     }
   }
