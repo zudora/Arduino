@@ -30,8 +30,6 @@ int sweepDir = 1;     //direction of sweep
 int prevLine = -2;     //last center line on sweep
 int senseCount = 0;   //number of sensor cycles 
 
-bool firstRun = true;
-
 //accelerometer
 Adafruit_MMA8451 mma = Adafruit_MMA8451();
 int accelArray[3];
@@ -59,16 +57,12 @@ void setup() {
   
   Serial.print("Range = "); Serial.print(2 << mma.getRange());  
   Serial.println("G");
- 
+  // For debugging: Hold off so there's time to open serial monitor 
+  delay(5000);
 }
 
 void loop() 
 {
-  if (firstRun == true)
-  {
-    delay(3000);
-  }
-  firstRun = false;
  // The loop runs over and over
  // Each run, it checks the state
  // Outer state variables and their effect:
@@ -162,6 +156,30 @@ void alternate()
   //Serial.print("Alternate cycleCount: ");Serial.print(cycleCount);Serial.print("\n");
   if (cycleCount <= 2)
   {
+    // change interval every third round
+    if (altCount % 3 == 0 && altCount != 0)
+    {
+     //Serial.print("Mod\n");      
+     interval = interval + (timeDir * 100);
+     if (interval < 0) {Serial.print("Interval too low");}     
+    }       
+    Serial.print(altCount); Serial.print("\n");
+                
+    if (altCount == 9)
+    {
+      Serial.print("Changing direction\n"); 
+      // Change time interval direction
+      timeDir = -1;
+    }
+    if (altCount == 24)
+    {
+     Serial.print("finished a cycle. Increment\n"); 
+     // finished a cycle. Increment
+     cycleCount++;      
+     altCount = 0;
+     timeDir = 1;
+    }
+    
     // If it's the first round, set up alternation
     //Serial.print("altCount: ");Serial.print(altCount);Serial.print("\n");
     if (altCount == 0)
@@ -194,32 +212,9 @@ void alternate()
         }
       }
     }
-    // change interval every third round
-    if (altCount % 3 == 0)
-    {
-     //Serial.print("Mod\n");      
-     interval = interval + (timeDir * 100);     
-    }
-    
     altCount++;
-        
-    Serial.print(altCount); Serial.print("\n");
-                
-    if (altCount == 9)
-    {
-      Serial.print("Changing direction\n"); 
-      // Change time interval direction
-      timeDir = -1;
-    }
-    if (altCount == 24)
-    {
-     Serial.print("finished a cycle. Increment\n"); 
-     // finished a cycle. Increment
-     cycleCount++; 
-     //resetting this value to zero breaks everything. The initial steps never execute
-     altCount = 0;
-     timeDir = 1;
-    }
+    
+    
   }
   else
   {
