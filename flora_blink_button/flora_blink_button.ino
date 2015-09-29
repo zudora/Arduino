@@ -163,7 +163,7 @@ void alternate()
      interval = interval + (timeDir * 100);
      if (interval < 0) {Serial.print("Interval too low");}     
     }       
-    Serial.print(altCount); Serial.print("\n");
+    Serial.print(cycleCount);Serial.print(": ");Serial.print(altCount); Serial.print("\n");
                 
     if (altCount == 9)
     {
@@ -171,7 +171,7 @@ void alternate()
       // Change time interval direction
       timeDir = -1;
     }
-    if (altCount == 24)
+    if (altCount == 18)
     {
      Serial.print("finished a cycle. Increment\n"); 
      // finished a cycle. Increment
@@ -184,33 +184,45 @@ void alternate()
     //Serial.print("altCount: ");Serial.print(altCount);Serial.print("\n");
     if (altCount == 0)
     {
-    Serial.print("First run\n");     
+     Serial.print("First run\n");
+     stateString = "";     
      for (int led = 0; led < ledCount; led++)
      {
       if (led % 2 == 0)
       {
-         digitalWrite(ledArray[led], LOW);         
-      }
+         digitalWrite(ledArray[led], HIGH);         
+         stateString += led;
+         stateString += ": HIGH, "; 
+       }
       else
       {
-        digitalWrite(ledArray[led], HIGH);
+        digitalWrite(ledArray[led], LOW);
+        stateString += led;
+        stateString += ": LOW, "; 
       }
+      Serial.print(stateString);
      }
     }            
     else
-    {
-     stateString.concat(stateString + "\t" + altCount + "\t");
+    {     
+      stateString = "";
       for (int led = 0; led < ledCount; led++)
       {
         if (ledArray[led] == LOW)
         {
           digitalWrite(ledArray[led], HIGH);                  
+          stateString += led;
+          stateString += ": HIGH, ";          
+          
         }               
         else
         {
           digitalWrite(ledArray[led], LOW);
-        }
+          stateString += led;
+          stateString += ": LOW, ";          
+          }
       }
+      Serial.print(stateString);
     }
     altCount++;
     
