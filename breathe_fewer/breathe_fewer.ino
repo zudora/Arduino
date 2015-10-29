@@ -26,6 +26,9 @@ void loop() {
   delay(5000);
 }
 
+//Made some changes to try to make coin cell batteries work. Looks like it may be an issue of max current and not just the 6v needing to be dropped to 3.5-4v.
+//Tried various resistors
+//Using a capacitor across the power smoothed out the flickering but made the colors not appear correctly. 
 void breatheAll() {
     for (int i=10; i <= 127 ; i++) {
     for(int j=0; j < strip.numPixels(); j++) {
