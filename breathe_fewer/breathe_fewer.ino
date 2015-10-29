@@ -17,12 +17,12 @@ void setup() {
 
 void loop() {
     
-  breatheAll();  
-  breatheAll();  
-  breatheAll();
-//  breatheAllblue();
-//  breatheAllblue();
-//  breatheAllblue();
+//  breatheAll();  
+//  breatheAll();  
+//  breatheAll();
+  breatheAllblue();
+  breatheAllblue();
+  breatheAllblue();
   delay(5000);
 }
 
@@ -48,21 +48,21 @@ void breatheAll() {
   delay(300);
 }
 
+//Use for blue-purple colors appropriate for jellyfish.
 void breatheAllblue() {
   for (int i=5; i <= 127 ; i++) {
-    for(int j=0; j<strip.numPixels(); j++) {
-      //strip.setPixelColor(j, strip.Color(i+15,i,0)); // yellow with a little extra red to make it warmer 
-      strip.setPixelColor(j, strip.Color(0,i*2,i));
+    for(int j=0; j<strip.numPixels(); j++) {      
+      strip.setPixelColor(j, strip.Color(i, 0, i*2));
     }
     strip.show();
-    delay(25);
+    delay(100);
   }
   for (int i = 127; i >= 5; i--) {
     for(int j=0; j<strip.numPixels(); j++) {
-      strip.setPixelColor(j, strip.Color(0,i*2,i));
+      strip.setPixelColor(j, strip.Color(i, 0, i*2));
     }
     strip.show();
-    delay(25);
+    delay(100);
   }
   delay(300);
 }
