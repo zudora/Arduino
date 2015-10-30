@@ -50,19 +50,24 @@ void breatheAll() {
 
 //Use for blue-purple colors appropriate for jellyfish.
 void breatheAllblue() {
+  const in delay_time = 100;
+  const in led_delay = 10;
+  
   for (int i=5; i <= 127 ; i++) {
     for(int j=0; j<strip.numPixels(); j++) {      
       strip.setPixelColor(j, strip.Color(i, 0, i*2));
+      delay(led_delay)
     }
     strip.show();
-    delay(100);
+    //delay(delay_time);
   }
   for (int i = 127; i >= 5; i--) {
     for(int j=0; j<strip.numPixels(); j++) {
       strip.setPixelColor(j, strip.Color(i, 0, i*2));
-    }
+      delay(led_delay)
+    }    
     strip.show();
-    delay(100);
+    //delay(delay_time);
   }
   delay(300);
 }
