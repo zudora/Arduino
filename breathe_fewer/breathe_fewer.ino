@@ -69,7 +69,7 @@ void breatheAllblue() {
     }
     
     for(int j=0; j<strip.numPixels(); j++) {      
-      strip.setPixelColor(j, strip.Color(i, 0, i*2));
+      strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
       delay(led_delay);
     }
     strip.show();
@@ -77,7 +77,7 @@ void breatheAllblue() {
   }
   for (int i = 127; i >= 5; i--) {
     for(int j=0; j<strip.numPixels(); j++) {
-      strip.setPixelColor(j, strip.Color(i, 0, i*2));
+      strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
       delay(led_delay);
     }    
     strip.show();
