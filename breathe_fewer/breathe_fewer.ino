@@ -27,45 +27,19 @@ void setup() {
 }
 
 void loop() {
-    
-  //breatheAll();  
-  //breatheAll();  
-  //breatheAll();
-  breatheAllRand();
-  breatheAllRand();
-  breatheAllRand();
-  delay(5000);
-}
 
-void breatheAll() {
-  const int delay_time = 100;
-  const int led_delay = 10;
-  
-  for (int i=10; i <= 127 ; i++) {
-  for(int j=0; j < strip.numPixels(); j++) {
-    //strip.setPixelColor(j, strip.Color(i+15, i, 0)); // Original: yellow with a little extra red to make it warmer
-    strip.setPixelColor(j, strip.Color(i, 0, i*2));        
-      delay(led_delay); // Trying delay between led updates
-    }  
-  strip.show();    
-  //delay(100);
-  }
-  for (int i = 127; i >= 10; i--) {
-    for(int j=0; j < strip.numPixels(); j++) {      
-      strip.setPixelColor(j, strip.Color(i, 0, i*2));      
-    }    
-    strip.show();    
-    delay(100);
-  }
-  delay(300);
+  breatheAllRand(110);
+  breatheAllRand(127);
+  breatheAllRand(90);
+  delay(1000);
 }
 
 //Randomizing next led to update
-void breatheAllRand() {
+void breatheAllRand(int max_red) {
   const int delay_time = 100;
   const int led_delay = 10;
   
-  for (int i=5; i <= 127 ; i++) {    
+  for (int i=5; i <= max_red ; i++) {    
     for(int j=0; j<strip.numPixels(); j++) {      
       
       strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
@@ -75,7 +49,7 @@ void breatheAllRand() {
     //strip.show();
     //delay(delay_time);
   }
-  for (int i = 127; i >= 5; i--) {
+  for (int i = max_red; i >= 5; i--) {
     for(int j=0; j<strip.numPixels(); j++) {
       strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
       strip.show();
