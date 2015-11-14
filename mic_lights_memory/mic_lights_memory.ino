@@ -2,8 +2,13 @@
 
 #define PIN 6
 
-int ledNum = 2;
-int last20; //For keeping track of previous peaks
+const int ledNum = 2;
+
+int volAccum; //For keeping track of previous peaks
+int prevAvg = 0;
+const int memorySize = 100;
+int maxBrightness = 200;
+int minVol = 0;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(ledNum, PIN, NEO_GRB + NEO_KHZ800);
 
@@ -20,7 +25,7 @@ void setup()
 
 void loop() 
 {
-  for (int windowCount = 0; windowCount < 20; windowCount++)
+  for (int windowCount = 0; windowCount < memorySize; windowCount++)
   {
     unsigned long startMillis= millis();  // Start of sample window
     unsigned int peakToPeak = 0;   // peak-to-peak level
@@ -46,7 +51,7 @@ void loop()
       }
     }
     peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
-    int brightness = map(peakToPeak, 0, 1023, 0, 255);
+    int brightness = map(peakToPeak, minVol, 1023, 0, maxBrightness);
     
     for (int i = 0; i < ledNum; i++){
         strip.setPixelColor(i, strip.Color(brightness, 0, 0));
@@ -54,11 +59,22 @@ void loop()
     }
   
     // add peak to list
-    last20 += brightness;   
+    volAccum += brightness;   
     //double volts = (peakToPeak * 3.3) / 1024;  // convert to volts
     //Serial.println(volts);    
   }
-  int average = last20 / 20;
-  Serial.println(average);
-  last20 = 0;
+  int latestAvg = volAccum / memorySize;
+  Serial.println(latestAvg);
+
+  // If last few seconds over a certain threshold, use a narrower map
+  if (prevAvg > 200 && volAccum > 200){
+    minVol = 100;
+  }
+  else if (prevAvg > 400 && volAccum > 400){
+    minVol = 300;
+  }
+  
+  prevAvg = latestAvg;
+  latestAvg = 0;
+  volAccum = 0;
 }
