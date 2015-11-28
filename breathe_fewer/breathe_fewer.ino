@@ -1,14 +1,20 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN 0
+
+const int numLeds = 16; 
+
 int ledNum[16];
+int blueCycles;
+int blueInc;
+int blueVal = 0;
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
 //   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
 //   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(ledNum, PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(numLeds, PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   strip.begin();
@@ -39,24 +45,23 @@ void breatheAllRand(int max_red) {
   const int delay_time = 100;
   const int led_delay = 10;
   
-  for (int i=5; i <= max_red ; i++) {    
-    for(int j=0; j<strip.numPixels(); j++) {      
-      
-      strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
-      strip.show();
-      delay(led_delay);
-    }
-    //strip.show();
-    //delay(delay_time);
+  for (int redVal=5; redVal <= max_red ; redVal++) {         
+    for (int blueAug = 1; blueAug <= 2; blueAug++) {      
+      for(int j=0; j<strip.numPixels(); j++) {              
+        strip.setPixelColor(ledNum[j], strip.Color(redVal, 0, redVal + blueAug));
+        strip.show();
+        delay(led_delay/ 2);
+      }
+    }     
   }
-  for (int i = max_red; i >= 5; i--) {
-    for(int j=0; j<strip.numPixels(); j++) {
-      strip.setPixelColor(ledNum[j], strip.Color(i, 0, i*2));
-      strip.show();
-      delay(led_delay);
+  for (int redVal = max_red; redVal >= 5; redVal--) {
+    for (int blueAug = 1; blueAug <= 2; blueAug++) {      
+      for(int j=0; j < strip.numPixels(); j++) {
+        strip.setPixelColor(ledNum[j], strip.Color(redVal, 0, redVal - blueAug));
+        strip.show();
+        delay(led_delay / 2);
+      }
     }    
-    //strip.show();
-    //delay(delay_time);
   }
   delay(300);
 }

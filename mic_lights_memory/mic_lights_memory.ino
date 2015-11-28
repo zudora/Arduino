@@ -1,8 +1,8 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 6
+#define PIN 2
 
-const int ledNum = 2;
+const int ledNum = 1;
 
 int volAccum; //For keeping track of previous peaks
 int prevAvg = 0;
@@ -19,11 +19,15 @@ unsigned int sample;
 
 void setup() 
 {
-  Serial.begin(9600);
+//  Serial.begin(9600);
   strip.begin();
   strip.setBrightness(90);
   strip.show(); // Initialize all pixels to 'off'
 }
+
+// In a quiet location, a value over 1024 is probably garbage
+// But in a loud location, we want to be able to discriminate
+
 
 void loop() 
 {
@@ -38,9 +42,10 @@ void loop()
     // collect data for 50 mS
     while (millis() - startMillis < sampleWindow)
     {
-      sample = analogRead(3);
+      sample = analogRead(2);
+      //Serial.println(sample);
       
-      if (sample < 1500)  // toss out spurious readings
+      if (sample < 1024)  // toss out spurious readings
       {
          if (sample > signalMax)
          {
@@ -53,7 +58,7 @@ void loop()
       }
     }
     peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
-    //Serial.println(peakToPeak);
+    Serial.println(peakToPeak);
     int brightness = map(peakToPeak, minVol, 1500, 0, maxBrightness);
     
     for (int i = 0; i < ledNum; i++){
@@ -68,7 +73,7 @@ void loop()
     
   }
   int latestAvg = volAccum / memorySize;
-  Serial.println(latestAvg);
+  //Serial.println(latestAvg);
 
   // If last few seconds over a certain threshold, use a narrower map
   if (abs(prevAvg - latestAvg) <= latestAvg * .3){
