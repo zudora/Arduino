@@ -59,7 +59,9 @@ void loop()
     }
     peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
     Serial.println(peakToPeak);
-    int brightness = map(peakToPeak, minVol, 1500, 0, maxBrightness);
+    int brightness = map(peakToPeak, minVol, 1800, 0, maxBrightness);
+    
+    //int brightness = map(peakToPeak, minVol, 1500, 0, maxBrightness);
     
     for (int i = 0; i < ledNum; i++){
         strip.setPixelColor(i, strip.Color(brightness, 0, 0));
