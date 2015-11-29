@@ -16,7 +16,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(numLeds, PIN, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   strip.begin();
-  strip.setBrightness(90);
+  strip.setBrightness(70);
   strip.show(); // Initialize all pixels to 'off'
   for (int i = 0; i < 16; i++){
     ledNum[i] = i;
@@ -46,7 +46,7 @@ void breatheAllRand(int max_red) {
   for (int redVal=5; redVal <= max_red ; redVal++) {         
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       for(int j=0; j<strip.numPixels(); j++) {              
-        strip.setPixelColor(ledNum[j], strip.Color(redVal, 0, redVal * 2 - blueAug ));
+        strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, redVal * 2 - blueAug ));
         strip.show();
         delay(led_delay/ 2);
       }
@@ -55,7 +55,7 @@ void breatheAllRand(int max_red) {
   for (int redVal = max_red; redVal >= 5; redVal--) {
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       for(int j=0; j < strip.numPixels(); j++) {
-        strip.setPixelColor(ledNum[j], strip.Color(redVal, 0, redVal * 2 + blueAug));
+        strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, redVal * 2 + blueAug));
         strip.show();
         delay(led_delay / 2);
       }
