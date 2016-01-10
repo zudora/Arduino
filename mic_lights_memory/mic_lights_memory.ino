@@ -19,7 +19,7 @@ unsigned int sample;
 
 void setup() 
 {
-//  Serial.begin(9600);
+  //Serial.begin(9600);
   strip.begin();
   strip.setBrightness(90);
   strip.show(); // Initialize all pixels to 'off'
@@ -42,7 +42,7 @@ void loop()
     // collect data for 50 mS
     while (millis() - startMillis < sampleWindow)
     {
-      sample = analogRead(2);
+      sample = analogRead(3);
       //Serial.println(sample);
       
       if (sample < 1024)  // toss out spurious readings
@@ -58,7 +58,7 @@ void loop()
       }
     }
     peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
-    Serial.println(peakToPeak);
+    //Serial.println(peakToPeak);
     int brightness = map(peakToPeak, minVol, 1800, 0, maxBrightness);
     
     //int brightness = map(peakToPeak, minVol, 1500, 0, maxBrightness);
@@ -79,8 +79,11 @@ void loop()
 
   // If last few seconds over a certain threshold, use a narrower map
   if (abs(prevAvg - latestAvg) <= latestAvg * .3){
+  //Serial.print("Voladjust\t");
+   //Serial.println(minVol);
     volAdjust(minVol, prevAvg);
   }
+  
 //  if (20 <= prevAvg < 30  && 20 < latestAvg < 30){
 //    volAdjust(minVol, prevAvg);
 //  }

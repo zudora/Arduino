@@ -41,25 +41,25 @@ void loop() {
 //Randomizing next led to update
 void breatheAllRand(int max_red) {
   const int delay_time = 100;
-  const int led_delay = 10;
+  const int led_delay = 50;
   
-  for (int redVal=5; redVal <= max_red ; redVal++) {         
+  for (int redVal=8; redVal <= max_red ; redVal++) {         
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       for(int j=0; j<strip.numPixels(); j++) {              
         strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, redVal * 2 - blueAug ));
         strip.show();
-        delay(led_delay/ 2);
+        delay(led_delay);
       }
-    }     
+    }    
   }
-  for (int redVal = max_red; redVal >= 5; redVal--) {
+  for (int redVal = max_red; redVal >= 8; redVal--) {
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       for(int j=0; j < strip.numPixels(); j++) {
         strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, redVal * 2 + blueAug));
         strip.show();
-        delay(led_delay / 2);
+        delay(led_delay);
       }
-    }    
+    }   
   }
   delay(300);
 }
