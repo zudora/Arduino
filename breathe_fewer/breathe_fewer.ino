@@ -3,7 +3,8 @@
 #define PIN 0
 
 const int numLeds = 16; 
-const int led_delay = 50;
+const int led_delay = 90;
+bool first = false;
  
 int wipeArray[16] = {8,7,9,6,10,5,11,4,12,3,13,2,14,1,15,0};
 
@@ -21,28 +22,36 @@ void setup() {
 }
 
 void loop() {
-  pulseAll(110);
-  pulseAll(127);
-  pulseAll(90);
-  delay(1000);
+  for (int i = 0; i <= 5; i++) {
+    pulseAll(100);
+    pulseAll(117);
+    pulseAll(70);
+    delay(8000);
+  }
 }
 
-//Currently using wipe to choose next led
 void pulseAll(int max_red) {
-  
-  for (int redVal=5; redVal <= max_red ; redVal++) {         
+//Currently using wipe to choose next led
+  if (first == true) {
+    for (int redVal = 1; redVal <= 5; redVal++) {         
+      for (int blueAug = 1; blueAug >= 0; blueAug--) {      
+        updateStrip(redVal, redVal - blueAug);      
+      }    
+    }    
+  }
+  for (int redVal = 5; redVal <= max_red; redVal++) {         
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
-      updateStrip(redVal, redVal * 2 - blueAug);      
+      updateStrip(redVal, (redVal * 2) + 20 - blueAug);      
     }    
   }
   for (int redVal = max_red; redVal >= 5; redVal--) {
     for (int blueAug = -1; blueAug <= 0; blueAug++) {      
-      updateStrip(redVal, redVal * 2 - blueAug);     
+      updateStrip(redVal, (redVal * 2) + 20 - blueAug);     
     }    
   }
-  if (max_red * 2 < 225) {
+  if ((max_red * 2) + 10 < 225) {
     //Make it bluer
-    int blueVal = max_red * 2;
+    int blueVal = max_red * 2 + 20;
     while (blueVal <= 235) {   
      for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       updateStrip(max_red, blueVal - blueAug);     
@@ -51,13 +60,14 @@ void pulseAll(int max_red) {
     }  
   }
   delay(300);
+  if (first == true) { first = false; }
 }
 
 void updateStrip(int redVal, int blueVal) {
     for(int j=0; j < strip.numPixels(); j++) {
       strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, blueVal));
       strip.show();
-      delay(led_delay);      
+      if (j % 2 == 0) { delay(led_delay); };      
     }
     genWipeArray();
 }
