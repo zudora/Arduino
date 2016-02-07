@@ -29,6 +29,8 @@ void setup()
 // But in a loud location, we want to be able to discriminate
 
 
+//current issue is long latency for high peaks
+
 void loop() 
 {
   for (int windowCount = 0; windowCount < memorySize; windowCount++)
@@ -42,7 +44,7 @@ void loop()
     // collect data for 50 mS
     while (millis() - startMillis < sampleWindow)
     {
-      sample = analogRead(3);
+      sample = analogRead(18);
       //Serial.println(sample);
       
       if (sample < 1024)  // toss out spurious readings
@@ -64,7 +66,7 @@ void loop()
     //int brightness = map(peakToPeak, minVol, 1500, 0, maxBrightness);
     
     for (int i = 0; i < ledNum; i++){
-        strip.setPixelColor(i, strip.Color(brightness, 0, 0));
+        strip.setPixelColor(i, strip.Color(brightness, 0, 0));        
         strip.show();
     }
   

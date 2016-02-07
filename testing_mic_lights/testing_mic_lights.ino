@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 6
+#define PIN 2
 
 int ledNum = 2;
 
@@ -28,7 +28,7 @@ void loop()
   // collect data for 50 mS
   while (millis() - startMillis < sampleWindow)
   {
-    sample = analogRead(0);
+    sample = analogRead(18);
     
     if (sample < 1024)  // toss out spurious readings
     {
@@ -45,7 +45,6 @@ void loop()
   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
   int brightness = map(peakToPeak, 0, 1023, 5, 255);
   
-  }
   for (int i = 0; i < ledNum; i++){
       strip.setPixelColor(i, strip.Color(brightness, 0, 0));
       strip.show();
