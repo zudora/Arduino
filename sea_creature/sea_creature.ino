@@ -23,17 +23,18 @@ void setup() {
 
 void loop() {
   for (int i = 0; i <= 5; i++) {
-    pulseAll(100);
+    pulseAll(100);    
     pulseAll(117);
     pulseAll(70);
-    delay(8000);
+    delay(9000);
   }
 }
 
 void pulseAll(int max_red) {
-//Currently using wipe to choose next led
-  if (first == true) {
+  //First round, set up quickly
+  if (first == true) {    
     for (int redVal = 1; redVal <= 5; redVal++) {         
+      if (redVal > 1) { first = false; }
       for (int blueAug = 1; blueAug >= 0; blueAug--) {      
         updateStrip(redVal, redVal - blueAug);      
       }    
@@ -44,6 +45,7 @@ void pulseAll(int max_red) {
       updateStrip(redVal, (redVal * 2) + 20 - blueAug);      
     }    
   }
+  delay(500);
   for (int redVal = max_red; redVal >= 5; redVal--) {
     for (int blueAug = -1; blueAug <= 0; blueAug++) {      
       updateStrip(redVal, (redVal * 2) + 20 - blueAug);     
@@ -59,16 +61,16 @@ void pulseAll(int max_red) {
      blueVal+=2;
     }  
   }
-  delay(300);
-  if (first == true) { first = false; }
+  delay(3000);
 }
 
 void updateStrip(int redVal, int blueVal) {
     for(int j=0; j < strip.numPixels(); j++) {
       strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, blueVal));
       strip.show();
-      if (j % 2 == 0) { delay(led_delay); };      
+      if (first == false && j % 2 == 0) { delay(led_delay); };      
     }
+    delay(100);
     genWipeArray();
 }
 
