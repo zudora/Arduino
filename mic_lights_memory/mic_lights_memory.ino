@@ -2,7 +2,7 @@
 
 #define PIN 2
 
-const int ledNum = 1;
+const int ledNum = 5;
 
 int volAccum; //For keeping track of previous peaks
 int numAccum = 0; //Number of peaks in current history
@@ -108,7 +108,14 @@ void loop() {
   if (numAccum == 20){
     prevArrayAvg = arrayAvg;
     for (int i = 0; i < numAccum; i++) {
+      if (i <= 5) {
+        accumArray[i] = accumArray[i + 15];
+      }
+      else {
+        accumArray[i] = 0;
+      }
     }
+    numAccum = 5;
   } 
 }
 
