@@ -33,9 +33,12 @@ void setup() {
 
 // In a quiet location, a value over 1024 is probably garbage
 // But in a loud location, we want to be able to discriminate
+// If the mic can handle it
 
 
-//current issue is long latency for high peaks
+//current issues
+// latency for high peaks
+// near-silence should be low glow. Too bright now
 
 void loop() {
   for (int windowCount = 0; windowCount < memorySize; windowCount++)
@@ -73,8 +76,43 @@ void loop() {
     accumArray[numAccum] = peakToPeak;
     if (numAccum < 20) { 
       numAccum++; 
-    }       
-  }
+    }
+    //Using array
+    arraySum = 0;  
+    for (int i = 0; i < numAccum; i++) {
+      arraySum += accumArray[i];
+    }
+    arrayAvg = arraySum / numAccum;
+  
+    // If last few seconds over a certain threshold, use a narrower map
+    if (abs(prevArrayAvg - arrayAvg) <= arrayAvg * .3) {
+      volAdjust(minVol, arrayAvg);
+    }
+    
+    //cleanup
+    if (numAccum == 20){
+      prevArrayAvg = arrayAvg;
+      for (int i = 0; i < numAccum; i++) {
+        if (i <= 5) {
+          accumArray[i] = accumArray[i + 15];
+        }
+        else {
+          accumArray[i] = 0;
+        }
+      }
+      numAccum = 5;
+    }
+  } 
+}
+
+void volAdjust(int minVol, int target) {
+    if (minVol < target) {
+      minVol += 10;
+    }
+    else if (minVol > target) {
+      minVol -= 10;      
+    }  
+}
   
   //average and convert to integer
 //  int latestAvg = volAccum / numAccum;
@@ -92,41 +130,6 @@ void loop() {
 //    numAccum = 0;
 //  }
 
-  //Using array
-  arraySum = 0;  
-  for (int i = 0; i < numAccum; i++) {
-    arraySum += accumArray[i];
-  }
-  arrayAvg = arraySum / numAccum;
-
-  // If last few seconds over a certain threshold, use a narrower map
-  if (abs(prevArrayAvg - arrayAvg) <= arrayAvg * .3) {
-    volAdjust(minVol, arrayAvg);
-  }
-  
-  //cleanup
-  if (numAccum == 20){
-    prevArrayAvg = arrayAvg;
-    for (int i = 0; i < numAccum; i++) {
-      if (i <= 5) {
-        accumArray[i] = accumArray[i + 15];
-      }
-      else {
-        accumArray[i] = 0;
-      }
-    }
-    numAccum = 5;
-  } 
-}
-
-void volAdjust(int minVol, int target) {
-    if (minVol < target) {
-      minVol += 10;
-    }
-    else if (minVol > target) {
-      minVol -= 10;      
-    }  
-}
 
 //Old mappings
 //  if (20 <= prevAvg < 30  && 20 < latestAvg < 30) {
