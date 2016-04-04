@@ -84,9 +84,14 @@ void loop() {
     }
     arrayAvg = arraySum / numAccum;
   
-    // If last few seconds over a certain threshold, use a narrower map
-    if (abs(prevArrayAvg - arrayAvg) <= arrayAvg * .3) {
+    // If last few seconds over a certain threshold, use a narrower map    
+    if (abs(prevArrayAvg - arrayAvg) >= 30 && abs(prevArrayAvg - arrayAvg) >= prevArrayAvg * .3) {
       volAdjust(minVol, arrayAvg);
+    }
+    else
+    {
+      //lower minVol
+      minVol = 0;
     }
     
     //cleanup
@@ -100,7 +105,7 @@ void loop() {
           accumArray[i] = 0;
         }
       }
-      numAccum = 5;
+      numAccum = 5;    
     }
   } 
 }
@@ -109,7 +114,7 @@ void volAdjust(int minVol, int target) {
     if (minVol < target) {
       minVol += 10;
     }
-    else if (minVol > target) {
+    else if (minVol >= target) {
       minVol -= 10;      
     }  
 }
