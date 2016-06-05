@@ -3,11 +3,14 @@
 #define PIN 0
 
 const int numLeds = 16; 
-const int led_delay = 90;
+const int led_delay = 150;
 bool first = true;
 bool last = false;
- 
+bool early = true;
+
+int useArray[16];
 int wipeArray[16] = {8,7,9,6,10,5,11,4,12,3,13,2,14,1,15,0};
+int fourPointArray[16] = {0,4,8,12,1,5,9,13,3,7,11,15,2,6,10,14};
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
@@ -24,7 +27,6 @@ void setup() {
 
 void loop() {
   for (int i = 0; i <= 5; i++) {    
-    first = true;
     pulseAll(90, true, 100);    
     pulseAll(102, true, 200);
     pulseAll(70, true, 50);
@@ -34,15 +36,38 @@ void loop() {
 }
 
 void pulseAll(int max_red, bool addFlutter, int fluttDelay) {
-  //First round, set up quickly  
+  //Start blues
+  early = true;
+
+  //structure
+  int startRed;
+  int endRed;
+  int inc;
+  int colorDiff;
+  int blueMult;
+
+  for (int initBlue = 1; initBlue <= 10; initBlue++) {
+    updateStrip(0, initBlue);
+    delay(300);
+  }
+  early = false;
+  //First full round
+  int passRed = 0;
   if (first == true) {    
     for (int redVal = 1; redVal <= 5; redVal++) {         
-      if (redVal > 1) { first = false; }
       for (int blueAug = 1; blueAug >= 0; blueAug--) {      
-        updateStrip(redVal, redVal + 20 - blueAug);      
+        updateStrip(redVal, redVal + 10 - blueAug);      
+        first = false;
+        passRed = redVal;
       }    
     }    
   }
+  //ramp up blue a bit
+//  for (int blueVal = passRed + 21; blueVal = (passRed * 2) + 49; blueVal++) {
+//    updateStrip(passRed, blueVal);
+//    delay(100); 
+//  }
+
   for (int redVal = 5; redVal <= max_red; redVal++) {         
     for (int blueAug = 1; blueAug >= 0; blueAug--) {      
       updateStrip(redVal, (redVal * 2) + 50 - blueAug);            
@@ -69,13 +94,25 @@ void pulseAll(int max_red, bool addFlutter, int fluttDelay) {
   if (last == true) {
     //Run down the scale for restart
   }
+  first = true;
 }
 
-void updateStrip(int redVal, int blueVal) {
+void runLoops(int startRed, int endRed, int inc, int colorDiff, int blueMult) {
+  
+  for (int redVal = startRed; redVal <= endRed; redVal + inc) {
+    for (int blueAug = 1; blueAug >= 0; blueAug--) {
+      updateStrip(redVal, (redVal * blueMult) + colorDiff - blueAug);
+    }  
+  }
+}
+
+void updateStrip(int redVal, int blueVal) {   
     for(int j=0; j < strip.numPixels(); j++) {
       strip.setPixelColor(wipeArray[j], strip.Color(redVal, 0, blueVal));
       strip.show();
-      if (first == false && j % 2 == 0) { delay(led_delay); };      
+      if ((first == false && j % 2 == 0) || early == true) { 
+        delay(led_delay); 
+        }      
     }
     delay(100);
     genWipeArray();
